@@ -1,6 +1,8 @@
 
 import sqlite3
 
+fileList = ('information.docx', 'Hello.txt', 'myImage.png', 'myMovie.mpg', 'World.txt', 'data.pdf', 'myPhoto.jpg')
+
 conn = sqlite3.connect("sqlitedrill.db")
 
 with conn:
@@ -8,23 +10,20 @@ with conn:
     cur.execute("CREATE TABLE IF NOT EXISTS tbl_files(\
         ID INTEGER PRIMARY KEY AUTOINCREMENT, \
         col_filename TEXT)")
-    conn.commit()
+    def data_entry():
+        for item in fileList:
+            if item.endswith(".txt"):
+                cur.execute("INSERT INTO tbl_files(col_filename) VALUES(?)", (item, ))
+        conn.commit()
+    data_entry()
+
+    cur.execute("SELECT col_filename FROM tbl_files")
+    print(cur.fetchall())
+
 conn.close()
 
-def get_file():
-    fileList = ('information.docx', 'Hello.txt', 'myImage.png', 'myMovie.mpg', 'World.txt', 'data.pdf', 'myPhoto.jpg')
-    for file in fileList:
-        if file.endswith(".txt"):
-            return (file)
-
-if __name__ == "__main__":
-    get_file()
 
 
-conn = sqlite3.connect("sqlitedrill.db")
-with conn:
-    cur = conn.cursor()
-    cur.execute("INSERT INTO tbl_files(col_filename) VALUES (file)")
-    conn.commit()        
-conn.close()
+
+
 
