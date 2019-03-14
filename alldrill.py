@@ -8,11 +8,14 @@ from tkinter.filedialog import askdirectory
 
 class MyFrame(Frame):
     def __init__(self):
-        Frame.__init__(self)
+        Frame.__init__(self)        
         self.master.resizable(width = False, height=False)
         self.master.geometry("425x160")
         self.master.title('Directory Drill')
         self.master.config(bg="#F9F7F6")
+
+        self.sourceDir = StringVar()
+        self.destDir = StringVar()
 
         self.btnSource = Button(self.master, text="Source", command=self.askdir, width=15 )
         self.btnSource.grid(row=0, column=0, padx=(10,0), pady=(20,0))
@@ -32,21 +35,23 @@ class MyFrame(Frame):
 
         
 
-    def askdir(self):
+    def askdir(self):        
         direct = askdirectory()
-        self.txtDirect.insert(INSERT,direct)
+        self.sourceDir = direct
+        self.txtDirect.insert(INSERT,direct)        
         return direct
 
 
 
-    def askdir2(self):
+    def askdir2(self):        
         direct2 = askdirectory()
-        self.txtDirect2.insert(INSERT,direct2)
+        self.destDir = direct2
+        self.txtDirect2.insert(INSERT,direct2)        
         return direct2
 
 
     def get_filez (self, direct, direct2):
-        direct = os.getcwd()
+        direct = os.getcwd()       
         for file in os.listdir(direct):
             time = os.path.getmtime(file)
             abPath=os.path.join(direct,file)
@@ -82,4 +87,5 @@ class MyFrame(Frame):
 
 if __name__ == "__main__":
     MyFrame().mainloop()
+
     
