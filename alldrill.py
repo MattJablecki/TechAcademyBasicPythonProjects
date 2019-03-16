@@ -1,7 +1,8 @@
 import os
 import shutil
 import sqlite3
-import tkinter 
+import tkinter
+import time
 from tkinter import *
 from tkinter.filedialog import askdirectory
 
@@ -37,7 +38,7 @@ class MyFrame(Frame):
 
     def askdir(self):        
         direct = askdirectory()
-        self.sourceDir = direct
+        self.sourceDir = direct + '/'
         self.txtDirect.insert(INSERT,direct)        
         return direct
 
@@ -45,22 +46,21 @@ class MyFrame(Frame):
 
     def askdir2(self):        
         direct2 = askdirectory()
-        self.destDir = direct2
+        self.destDir = direct2 + '/'
         self.txtDirect2.insert(INSERT,direct2)        
         return direct2
 
 
-    def get_filez (self, direct, direct2):
-        direct = os.getcwd()       
-        for file in os.listdir(direct):
-            time = os.path.getmtime(file)
-            abPath=os.path.join(direct,file)
+    def get_filez (self):      
+        for file in os.listdir(self.sourceDir):
             if file.endswith(".txt"):
-                shutil.move(file, direct2)
-                return(abPath, time)
-
- 
-    def enter_data(self,direct2):
+                print(file)
+                abPath=os.path.join(self.sourceDir,file)
+                print(abPath)
+                modtime = time.ctime(os.path.getmtime(abPath))
+                print(modtime)
+                shutil.move(abPath, self.destDir)
+                print ("Successfully moved {}".format(file))
 
         conn = sqlite3.connect("filedrill.db")
 
@@ -68,16 +68,15 @@ class MyFrame(Frame):
             cur = conn.cursor()
             cur.execute("CREATE TABLE IF NOT EXISTS tbl_files(\
                 ID INTEGER PRIMARY KEY AUTOINCREMENT, \
-                col_filename TEXT, col_modtime FLOAT)")
+                col_filename TEXT, col_modtime DATETIME)")
             def data_entry():
-                for item in direct2:
-                    if item.endswith(".txt"):
-                        cur.execute("INSERT INTO tbl_files(col_filename, col_modtime) VALUES(?), (?)", (item, ))
-                conn.commit()
+                for file in os.listdir(self.destDir):
+                    if file.endswith(".txt"):
+                        abPath=os.path.join(self.destDir,file)
+                        modtime = time.ctime(os.path.getmtime(abPath))
+                        cur.execute("INSERT INTO tbl_files(col_filename, col_modtime) VALUES(?,?)", (file, modtime))
+                        conn.commit()
             data_entry()
-
-            cur.execute("SELECT col_filename, col_modtime FROM tbl_files")
-            print(cur.fetchall())
 
         conn.close()
 
